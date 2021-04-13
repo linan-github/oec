@@ -213,7 +213,12 @@ func (p *poller) run() {
 }
 
 func newQueueMessageLogrus(region string) *logrus.Logger {
-	logFilePath := filepath.Join("/var", "log", "opsgenie", "oecQueueMessages-"+region+"-"+strconv.Itoa(os.Getpid())+".log")
+	defaultlogFilePath := filepath.Join("/var", "log", "opsgenie")
+	if os.Getenv("OEC_CONF_LOG_FILE_PATH") != "" {
+		defaultlogFilePath = os.Getenv("OEC_CONF_LOG_FILE_PATH")
+	}
+
+	logFilePath := filepath.Join(defaultlogFilePath, "oecQueueMessages-"+region+"-"+strconv.Itoa(os.Getpid())+".log")
 	queueMessageLogger := &lumberjack.Logger{
 		Filename:  logFilePath,
 		MaxSize:   3,  // MB
