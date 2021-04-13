@@ -21,16 +21,22 @@ import (
 )
 
 var metricAddr = flag.String("oec-metrics", "7070", "The address to listen on for HTTP requests.")
-var defaultLogFilepath = filepath.Join("/var", "log", "opsgenie", "oec"+strconv.Itoa(os.Getpid())+".log")
+var defaultLogPath = filepath.Join("/var", "log", "opsgenie")
+var defaultLogFilepath string
 
 var OECVersion string
 var OECCommitVersion string
 
 func main() {
 
+	if os.Getenv("OEC_CONF_LOG_FILE_PATH") != "" {
+		defaultLogPath = os.Getenv("OEC_CONF_LOG_FILE_PATH")
+	}
+	defaultLogFilepath = filepath.Join(defaultLogPath, "oec"+strconv.Itoa(os.Getpid())+".log")
+
 	logrus.SetFormatter(conf.PrepareLogFormat())
 
-	err := os.Chmod(filepath.Join("/var", "log", "opsgenie"), 0744)
+	err := os.Chmod(defaultLogPath, 0744)
 	if err != nil {
 		logrus.Warn(err)
 	}
